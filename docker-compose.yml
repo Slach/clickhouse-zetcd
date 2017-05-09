@@ -12,10 +12,10 @@ services:
             - zetcd
         entrypoint: /usr/bin/zk-dump --iface eth0
     zetcd:
-        image: zookeeper
-#        build:
-#            context: .
-#            dockerfile: Dockerfile-zetcd
+#        image: zookeeper
+        build:
+            context: .
+            dockerfile: Dockerfile-zetcd
         depends_on:
             - etcd
         links:

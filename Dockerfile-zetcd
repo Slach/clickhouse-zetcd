@@ -1,13 +1,15 @@
 FROM golang:alpine
 MAINTAINER Eugene Klimov <bloodjazman@gmail.com>
+ARG DOCKERIZE_VERSION="v0.4.0"
 
-RUN apk --no-cache add git && \
+RUN apk --no-cache add git openssl wget && \
+    wget -qO- https://github.com/jwilder/dockerize/releases/download/$DOCKERIZE_VERSION/dockerize-alpine-linux-amd64-$DOCKERIZE_VERSION.tar.gz | tar xvz -C /usr/local/bin && \
     mkdir -p /zetcd && \
     GOPATH=/zetcd go get github.com/coreos/zetcd/cmd/zetcd && \
-    apk del git && \
+    apk del git openssl wget && \
     cp -v /zetcd/bin/zetcd /bin/zetcd && \
-    rm -rf /zetcd
+    rm -rfv /zetcd
 
 ENV ETCD_HOST=etcd:2379
 
-ENTRYPOINT zetcd --zkaddr 0.0.0.0:2181 --endpoints ${ETCD_HOST}
+ENTRYPOINT dockerize -wait tcp://${ETCD_HOST} && zetcd --zkaddr 0.0.0.0:2181 --endpoints ${ETCD_HOST}
