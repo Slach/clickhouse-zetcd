@@ -1,0 +1,11 @@
+version: '2'
+services:
+    clickhouse.base:
+        image: yandex/clickhouse-server
+        volumes:
+        - ./clickhouse/config.xml:/etc/clickhouse-server/config.xml
+        environment:
+            CLICKHOUSE_SHARD: 1
+            CLICKHOUSE_REPLICA: clickhouse.base
+            CLICKHOUSE_CONFIG: /etc/clickhouse-server/config.xml
+        entrypoint: sh -c 'mkdir -p /etc/clickhouse-server/conf.d/ && echo "<?xml version=\"1.0\"?><yandex><macros><shard>$$CLICKHOUSE_SHARD</shard><replica>$$CLICKHOUSE_REPLICA</replica></macros></yandex>" > /etc/clickhouse-server/conf.d/macros.xml && /usr/bin/clickhouse-server --config=$$CLICKHOUSE_CONFIG'

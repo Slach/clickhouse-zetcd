@@ -1,0 +1,111 @@
+version: '2'
+services:
+    etcd:
+        image: quay.io/coreos/etcd:latest
+        entrypoint: /usr/local/bin/etcd --name clickhouse-etcd --data-dir /var/lib/etcd --listen-client-urls http://0.0.0.0:2379 --advertise-client-urls http://0.0.0.0:2379 --listen-peer-urls http://0.0.0.0:2380 --initial-advertise-peer-urls http://0.0.0.0:2380 --initial-cluster clickhouse-etcd=http://0.0.0.0:2380 --initial-cluster-token clickhouse-etcd --initial-cluster-state new --auto-compaction-retention 1
+    zktraffic:
+        build:
+            context: .
+            dockerfile: Dockerfile-zktraffic
+        network_mode: "service:zetcd"
+        depends_on:
+            - zetcd
+        entrypoint: /usr/bin/zk-dump --iface eth0
+    zetcd:
+        image: zookeeper
+#        build:
+#            context: .
+#            dockerfile: Dockerfile-zetcd
+        depends_on:
+            - etcd
+        links:
+            - etcd
+    clickhouse-ru-1.local:
+        extends:
+            file: clickhouse-compose.yml
+            service: clickhouse.base
+        environment:
+            CLICKHOUSE_SHARD: 1
+            CLICKHOUSE_REPLICA: clickhouse-ru-1.local
+        depends_on:
+            - etcd
+            - zetcd
+        links:
+            - etcd
+            - zetcd
+    clickhouse-ru-2.local:
+        extends:
+            file: clickhouse-compose.yml
+            service: clickhouse.base
+        depends_on:
+            - etcd
+            - zetcd
+        links:
+            - etcd
+            - zetcd
+        environment:
+            CLICKHOUSE_SHARD: 1
+            CLICKHOUSE_REPLICA: clickhouse-ru-2.local
+    clickhouse-eu-1.local:
+        extends:
+            file: clickhouse-compose.yml
+            service: clickhouse.base
+        depends_on:
+            - etcd
+            - zetcd
+        links:
+            - etcd
+            - zetcd
+        environment:
+            CLICKHOUSE_SHARD: 2
+            CLICKHOUSE_REPLICA: clickhouse-eu-1.local
+    clickhouse-eu-2.local:
+        extends:
+            file: clickhouse-compose.yml
+            service: clickhouse.base
+        depends_on:
+            - etcd
+            - zetcd
+        links:
+            - etcd
+            - zetcd
+        environment:
+            CLICKHOUSE_SHARD: 2
+            CLICKHOUSE_REPLICA: clickhouse-eu-2.local
+    clickhouse-us-1.local:
+        extends:
+            file: clickhouse-compose.yml
+            service: clickhouse.base
+        depends_on:
+            - etcd
+            - zetcd
+        links:
+            - etcd
+            - zetcd
+        environment:
+            CLICKHOUSE_SHARD: 3
+            CLICKHOUSE_REPLICA: clickhouse-us-1.local
+    clickhouse-us-2.local:
+        extends:
+            file: clickhouse-compose.yml
+            service: clickhouse.base
+        depends_on:
+            - etcd
+            - zetcd
+        links:
+            - etcd
+            - zetcd
+        environment:
+            CLICKHOUSE_SHARD: 3
+            CLICKHOUSE_REPLICA: clickhouse-us-2.local
+    clickhouse-client.local:
+        image: yandex/clickhouse-client
+        depends_on:
+            - etcd
+            - zetcd
+            - clickhouse-ru-1.local
+            - clickhouse-ru-2.local
+            - clickhouse-eu-1.local
+            - clickhouse-eu-2.local
+            - clickhouse-us-1.local
+            - clickhouse-us-2.local
