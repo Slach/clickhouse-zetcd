@@ -48,8 +48,8 @@ Vagrant.configure(2) do |config|
 	docker-compose run clickhouse-client.local -h clickhouse-ru-2.local --echo -q "CREATE TABLE IF NOT EXISTS zetcd_test.test_replicated (timestamp UInt32, date MATERIALIZED toDate(timestamp), trackerId String,   userId String  ) ENGINE = ReplicatedMergeTree('/clickhouse/tables/{shard}/hits_replicated', '{replica}', date, cityHash64( userId), (trackerId, date, cityHash64(userId), timestamp), 8192);"
 	docker-compose run clickhouse-client.local -h clickhouse-ru-1.local --echo -q "INSERT INTO zetcd_test.test_replicated (timestamp, trackerId, userId ) VALUES (1, 'test1','test1')"
 	docker-compose run clickhouse-client.local -h clickhouse-ru-2.local --echo -q "INSERT INTO zetcd_test.test_replicated (timestamp, trackerId, userId ) VALUES (1, 'test2','test2')"
-	docker-compose run clickhouse-client.local -h clickhouse-ru-1.local --echo -q "SELECT * zetcd_test.test_replicated"
-	docker-compose run clickhouse-client.local -h clickhouse-ru-2.local --echo -q "SELECT * zetcd_test.test_replicated"
+	docker-compose run clickhouse-client.local -h clickhouse-ru-1.local --echo -q "SELECT * FROM zetcd_test.test_replicated"
+	docker-compose run clickhouse-client.local -h clickhouse-ru-2.local --echo -q "SELECT * FROM zetcd_test.test_replicated"
 	# docker-compose logs zktraffic
 	echo "click PROVISIONING DONE, Good Luck ;)"
   SHELL
