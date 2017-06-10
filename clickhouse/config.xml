@@ -65,7 +65,7 @@
          https://clickhouse.yandex/reference_en.html#Distributed
       -->
     <remote_servers>
-        <ga2clickhouse>
+        <zetcd_clickhouse>
             <shard>
                 <weight>1</weight>
                 <internal_replication>false</internal_replication>
@@ -102,7 +102,7 @@
                     <port>9000</port>
                 </replica>
             </shard>
-        </ga2clickhouse>
+        </zetcd_clickhouse>
     </remote_servers>
 
 

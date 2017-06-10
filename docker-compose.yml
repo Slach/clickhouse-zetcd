@@ -109,3 +109,12 @@ services:
             - clickhouse-eu-2.local
             - clickhouse-us-1.local
             - clickhouse-us-2.local
+        links:
+            - etcd
+            - zetcd
+            - clickhouse-ru-1.local
+            - clickhouse-ru-2.local
+            - clickhouse-eu-1.local
+            - clickhouse-eu-2.local
+            - clickhouse-us-1.local
+            - clickhouse-us-2.local
