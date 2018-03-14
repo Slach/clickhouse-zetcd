@@ -16,7 +16,7 @@ Vagrant.configure(2) do |config|
   config.vm.provider "virtualbox" do |vb|
     # Display the VirtualBox GUI when booting the machine
     vb.gui = false
-  
+
     # Customize the amount of memory on the VM:
     vb.memory = "2094"
   end
@@ -31,7 +31,7 @@ Vagrant.configure(2) do |config|
     apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 136221EE520DDFAF0A905689B9316A7BC7917B12
     # docker
     apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 8D81803C0EBFCD88
-    add-apt-repository "deb http://repo.yandex.ru/clickhouse/xenial/ stable main"
+    add-apt-repository "deb http://repo.yandex.ru/clickhouse/deb/testing/ main/"
     add-apt-repository "deb https://download.docker.com/linux/ubuntu xenial edge"
     apt-get update
     apt-get install -y docker-ce
@@ -41,16 +41,18 @@ Vagrant.configure(2) do |config|
     python -m pip install -U pip
     pip install -U docker-compose
     cd /vagrant
-  	docker-compose up -d
-	docker-compose run clickhouse-client.local -h clickhouse-ru-1.local --echo -q "CREATE DATABASE IF NOT EXISTS zetcd_test"
-	docker-compose run clickhouse-client.local -h clickhouse-ru-2.local --echo -q "CREATE DATABASE IF NOT EXISTS zetcd_test"
-	docker-compose run clickhouse-client.local -h clickhouse-ru-1.local --echo -q "CREATE TABLE IF NOT EXISTS zetcd_test.test_replicated (timestamp UInt32, date MATERIALIZED toDate(timestamp), trackerId String,   userId String  ) ENGINE = ReplicatedMergeTree('/clickhouse/tables/{shard}/hits_replicated', '{replica}', date, cityHash64( userId), (trackerId, date, cityHash64(userId), timestamp), 8192);"
-	docker-compose run clickhouse-client.local -h clickhouse-ru-2.local --echo -q "CREATE TABLE IF NOT EXISTS zetcd_test.test_replicated (timestamp UInt32, date MATERIALIZED toDate(timestamp), trackerId String,   userId String  ) ENGINE = ReplicatedMergeTree('/clickhouse/tables/{shard}/hits_replicated', '{replica}', date, cityHash64( userId), (trackerId, date, cityHash64(userId), timestamp), 8192);"
-	docker-compose run clickhouse-client.local -h clickhouse-ru-1.local --echo -q "INSERT INTO zetcd_test.test_replicated (timestamp, trackerId, userId ) VALUES (1, 'test1','test1')"
-	docker-compose run clickhouse-client.local -h clickhouse-ru-2.local --echo -q "INSERT INTO zetcd_test.test_replicated (timestamp, trackerId, userId ) VALUES (1, 'test2','test2')"
-	docker-compose run clickhouse-client.local -h clickhouse-ru-1.local --echo -q "SELECT * FROM zetcd_test.test_replicated"
-	docker-compose run clickhouse-client.local -h clickhouse-ru-2.local --echo -q "SELECT * FROM zetcd_test.test_replicated"
-	# docker-compose logs zktraffic
-	echo "click PROVISIONING DONE, Good Luck ;)"
+    docker-compose up -d
+    docker-compose run clickhouse-client.local -h clickhouse-ru-1.local --echo -q "CREATE DATABASE IF NOT EXISTS zetcd_test"
+    docker-compose run clickhouse-client.local -h clickhouse-ru-2.local --echo -q "CREATE DATABASE IF NOT EXISTS zetcd_test"
+    docker-compose run clickhouse-client.local -h clickhouse-ru-1.local --echo -q "CREATE TABLE IF NOT EXISTS zetcd_test.test_replicated (timestamp UInt32, date MATERIALIZED toDate(timestamp), trackerId String,   userId String  ) ENGINE = ReplicatedMergeTree('/clickhouse/tables/{shard}/hits_replicated', '{replica}', date, cityHash64( userId), (trackerId, date, cityHash64(userId), timestamp), 8192);"
+    docker-compose run clickhouse-client.local -h clickhouse-ru-2.local --echo -q "CREATE TABLE IF NOT EXISTS zetcd_test.test_replicated (timestamp UInt32, date MATERIALIZED toDate(timestamp), trackerId String,   userId String  ) ENGINE = ReplicatedMergeTree('/clickhouse/tables/{shard}/hits_replicated', '{replica}', date, cityHash64( userId), (trackerId, date, cityHash64(userId), timestamp), 8192);"
+    docker-compose run clickhouse-client.local -h clickhouse-ru-1.local --echo -q "INSERT INTO zetcd_test.test_replicated (timestamp, trackerId, userId ) VALUES (1, 'test1','test1')"
+    docker-compose run clickhouse-client.local -h clickhouse-ru-2.local --echo -q "INSERT INTO zetcd_test.test_replicated (timestamp, trackerId, userId ) VALUES (1, 'test2','test2')"
+    docker-compose run clickhouse-client.local -h clickhouse-ru-1.local --echo -q "SELECT * FROM zetcd_test.test_replicated"
+    docker-compose run clickhouse-client.local -h clickhouse-ru-2.local --echo -q "SELECT * FROM zetcd_test.test_replicated"
+    # docker login -u clickhousepro
+    # docker-compose push zetcd
+    # docker-compose logs zktraffic
+    echo "click PROVISIONING DONE, Good Luck ;)"
   SHELL
 end
