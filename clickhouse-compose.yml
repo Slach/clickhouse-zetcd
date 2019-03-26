@@ -4,9 +4,7 @@ services:
     image: yandex/clickhouse-server
     volumes:
     - ./clickhouse/config.xml:/etc/clickhouse-server/config.xml
-    - /etc/apport/:/etc/apport/
-    - /usr/share/apport/:/usr/share/apport/
-    - /var/crash/:/var/crash/
+    - /var/log/clickhouse-server
     environment:
       CLICKHOUSE_SHARD: 1
       CLICKHOUSE_REPLICA: clickhouse.base
