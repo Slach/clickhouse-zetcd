@@ -17,8 +17,6 @@ services:
         build:
            context: .
            dockerfile: Dockerfile-zetcd
-        depends_on:
-            - etcd
         links:
             - etcd
     clickhouse-ru-1.local:
@@ -28,9 +26,6 @@ services:
         environment:
             CLICKHOUSE_SHARD: 1
             CLICKHOUSE_REPLICA: clickhouse-ru-1.local
-        depends_on:
-            - etcd
-            - zetcd
         links:
             - etcd
             - zetcd
@@ -38,9 +33,6 @@ services:
         extends:
             file: clickhouse-compose.yml
             service: clickhouse.base
-        depends_on:
-            - etcd
-            - zetcd
         links:
             - etcd
             - zetcd
@@ -51,9 +43,6 @@ services:
         extends:
             file: clickhouse-compose.yml
             service: clickhouse.base
-        depends_on:
-            - etcd
-            - zetcd
         links:
             - etcd
             - zetcd
@@ -64,9 +53,6 @@ services:
         extends:
             file: clickhouse-compose.yml
             service: clickhouse.base
-        depends_on:
-            - etcd
-            - zetcd
         links:
             - etcd
             - zetcd
@@ -77,9 +63,6 @@ services:
         extends:
             file: clickhouse-compose.yml
             service: clickhouse.base
-        depends_on:
-            - etcd
-            - zetcd
         links:
             - etcd
             - zetcd
@@ -90,9 +73,6 @@ services:
         extends:
             file: clickhouse-compose.yml
             service: clickhouse.base
-        depends_on:
-            - etcd
-            - zetcd
         links:
             - etcd
             - zetcd
@@ -100,16 +80,7 @@ services:
             CLICKHOUSE_SHARD: 3
             CLICKHOUSE_REPLICA: clickhouse-us-2.local
     clickhouse-client.local:
-        image: yandex/clickhouse-client
-        depends_on:
-            - etcd
-            - zetcd
-            - clickhouse-ru-1.local
-            - clickhouse-ru-2.local
-            - clickhouse-eu-1.local
-            - clickhouse-eu-2.local
-            - clickhouse-us-1.local
-            - clickhouse-us-2.local
+        image: yandex/clickhouse-client:latest
         links:
             - etcd
             - zetcd
@@ -119,3 +90,15 @@ services:
             - clickhouse-eu-2.local
             - clickhouse-us-1.local
             - clickhouse-us-2.local
+    clickhouse-test.local:
+        image:  yandex/clickhouse-integration-test:latest
+        links:
+          - etcd
+          - zetcd
+          - clickhouse-ru-1.local
+          - clickhouse-ru-2.local
+          - clickhouse-eu-1.local
+          - clickhouse-eu-2.local
+          - clickhouse-us-1.local
+          - clickhouse-us-2.local
+        entrypoint: "

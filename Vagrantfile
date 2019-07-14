@@ -52,15 +52,16 @@ Vagrant.configure(2) do |config|
     docker-compose run clickhouse-client.local -h clickhouse-ru-2.local --echo -q "INSERT INTO zetcd_test.test_replicated (timestamp, trackerId, userId ) VALUES (1, 'test2','test2')"
     docker-compose run clickhouse-client.local -h clickhouse-ru-1.local --echo -q "SELECT * FROM zetcd_test.test_replicated"
     docker-compose run clickhouse-client.local -h clickhouse-ru-2.local --echo -q "SELECT * FROM zetcd_test.test_replicated"
-    # docker login -u clickhousepro
-    # docker-compose push zetcd
-    # docker-compose logs zktraffic
     # after second insert with same data will skipped
     docker-compose run clickhouse-client.local -h clickhouse-ru-1.local --echo -q "INSERT INTO zetcd_test.test_replicated (timestamp, trackerId, userId ) VALUES (1, 'test1','test1')"
     docker-compose run clickhouse-client.local -h clickhouse-ru-1.local --echo -q "INSERT INTO zetcd_test.test_replicated (timestamp, trackerId, userId ) VALUES (3, 'test3','test3')"
     docker-compose run clickhouse-client.local -h clickhouse-ru-1.local --echo -q "SELECT * FROM zetcd_test.test_replicated"
     docker-compose run clickhouse-client.local -h clickhouse-ru-2.local --echo -q "SELECT * FROM zetcd_test.test_replicated"
 
+    # docker login -u clickhousepro
+    # docker-compose build zetcd
+    # docker-compose push zetcd
+    # docker-compose logs zktraffic
     echo "clickhouse + zetcd PROVISIONING DONE, self-test PASSED, Good Luck ;)"
   SHELL
 end

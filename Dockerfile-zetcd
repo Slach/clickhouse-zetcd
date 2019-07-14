@@ -1,4 +1,4 @@
-FROM golang:alpine
+FROM golang:alpine AS builder
 MAINTAINER Eugene Klimov <bloodjazman@gmail.com>
 ARG DOCKERIZE_VERSION="v0.4.0"
 
@@ -14,6 +14,8 @@ RUN apk --no-cache add git openssl ca-certificates wget && \
     cp -v /zetcd/bin/zetcd /bin/zetcd && \
     rm -rfv /zetcd
 
-ENV ETCD_HOST=etcd:2379
-
-ENTRYPOINT dockerize -wait tcp://${ETCD_HOST} && zetcd --zkaddr 0.0.0.0:2181 --endpoints ${ETCD_HOST}
+FROM alpine 
+ENV ETCD_ENDPOINTS=etcd:2379
+COPY --from=builder /bin/zetcd /bin/zetcd
+COPY --from=builder /usr/local/bin/dockerize /usr/local/bin/dockerize
+ENTRYPOINT dockerize -wait tcp://${ETCD_ENDPOINTS} && zetcd --zkaddr 0.0.0.0:2181 --endpoints ${ETCD_ENDPOINTS}
