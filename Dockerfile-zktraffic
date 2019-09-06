@@ -1,8 +1,8 @@
 FROM alpine:latest
 MAINTAINER Eugene Klimov <bloodjazman@gmail.com>
 
-RUN apk --no-cache add python py-pip py-psutil && \
-    pip install --no-cache-dir zktraffic && \
-    apk del py-pip
+RUN apk --no-cache add gcc python3 python3-dev py3-pip musl-dev linux-headers && \
+    pip3 install --no-cache-dir zktraffic && \
+    apk del gcc python3-dev musl-dev linux-headers
 
 ENTRYPOINT /usr/bin/zk-dump
